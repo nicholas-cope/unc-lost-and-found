@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UNC Lost Items</title>
+  <link href="style.css" rel="stylesheet" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/siwalikm/quick-form-css@2.2.2/qfc-dark.css">
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA-4UFitFjBWPaQ-5PFO2I7BkzmDm5o35A"></script>
+  
+
+
+</head>
+
+<body>
+  <header>
+    <h1>UNC Lost Items</h1>
+  </header>
+  <div class="topnav">
+    <a href="index.html">About</a>
+    <a class="active" href="lost.html">Lost Items</a>
+  </div>
+  <div id="map"></div>
+  <div class="qfc-container">
+    <form id="itemForm">
+      <label for="itemName">Item Name:</label><br>
+      <input type="text" id="itemName" name="itemName" required><br>
+      <label for="itemDescription">Item Description:</label><br>
+      <input type="text" id="itemDescription" name="itemDescription" required><br>
+      <label for="itemLocation">Approximate Last Location:</label><br>
+      <input type="text" id="itemLocation" name="itemLocation" required><br>
+
+
+      <label for="contact">Contact Email:</label><br>
+      <input type="text" id="contact" name="contact" required><br>
+      <label for="itemImage">Item Image:</label><br>
+      <input type="file" id="itemImage" name="itemImage"><br>
+      <input type="submit" value="Submit">
+    </form>
+  </div>
+  <div id="itemList">
+    <!-- Items will be added here dynamically using JavaScript -->
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Function to display lost items
+      function displayLostItems(items) {
+        var lostSection = document.getElementById('itemList');
+        lostSection.innerHTML = '';
+
+        items.forEach(function (item) {
+          var newItem = document.createElement('div');
+          newItem.classList.add('lost-item');
+
+          var itemTitle = document.createElement('h3');
+          itemTitle.textContent = item.name;
+
+          var itemDesc = document.createElement('p');
+          itemDesc.textContent = 'Description: ' + item.description;
+
+          var itemLoc = document.createElement('p');
+          itemLoc.textContent = 'Location: ' + item.location;
+
+          var email = document.createElement('p');
+          email.textContent = 'Email: ' + item.email;
+
+          if (item.image) {
+            var itemImg = document.createElement('img');
+            itemImg.src = item.image;
+
+            // Set the maximum width and height for the image
+            itemImg.style.maxWidth = '400px'; // Adjust the value to your preference
+            itemImg.style.maxHeight = '400px'; // Adjust the value to your preference
+
+            newItem.appendChild(itemImg);
+          }
+
+          // Create a "Remove" button
+          var removeButton = document.createElement('button');
+          removeButton.textContent = 'Resolve';
+          removeButton.addEventListener('click', function () {
+            // Call the removeItem function when the button is clicked
+            removeItem(item);
+          });
+          function removeItem(item) {
+            console.log("Removing item:", item);
+            // Retrieve existing items from localStorage
+            var storedItems = JSON.parse(localStorage.getItem('lostItems')) || [];
+
+            // Find the index of the item to remove in the storedItems array
+            var indexToRemove = storedItems.findIndex(function (existingItem) {
+              return existingItem.name === item.name && existingItem.description === item.description;
+            });
+
+            if (indexToRemove !== -1) {
+              // Remove the item from the storedItems array
+              storedItems.splice(indexToRemove, 1);
+
+              // Update the storedItems array in localStorage
+              localStorage.setItem('lostItems', JSON.stringify(storedItems));
+
+              // Update the display with the updated list of items
+              displayLostItems(storedItems);
+            }
+          }
+
+          newItem.appendChild(itemTitle); //item title/name
+          newItem.appendChild(itemDesc); //description
+          newItem.appendChild(itemLoc); //location
+          newItem.appendChild(email); // Add the email field
+          newItem.appendChild(removeButton); // Add the "Remove" button
+
+          lostSection.appendChild(newItem);
+
+
+          lostSection.appendChild(newItem);
+        });
+      }
+
+      // Retrieve stored items and display them on page load
+      var storedItems = JSON.parse(localStorage.getItem('lostItems')) || [];
+      displayLostItems(storedItems);
+
+      // Store the form data in localStorage when the form is submitted
+      document.getElementById('itemForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        // Collect form data
+        var itemName = document.getElementById('itemName').value;
+        var itemDescription = document.getElementById('itemDescription').value;
+        var itemLocation = document.getElementById('itemLocation').value;
+        var email = document.getElementById('contact').value;
+        var itemImage = document.getElementById('itemImage').files[0];
+
+        // Create an object to represent the item
+        var newItem = {
+          name: itemName,
+          description: itemDescription,
+          location: itemLocation,
+          email: email,
+          image: itemImage ? URL.createObjectURL(itemImage) : null,
+        };
+
+        // Retrieve existing items from localStorage or initialize an empty array
+        var storedItems = JSON.parse(localStorage.getItem('lostItems')) || [];
+
+        // Add the new item to the array
+        storedItems.push(newItem);
+
+        // Store the updated array back in localStorage
+        localStorage.setItem('lostItems', JSON.stringify(storedItems));
+
+        // Update the display with the newly added item (optional)
+        displayLostItems(storedItems);
+
+        // Clear the form fields
+        document.getElementById('itemName').value = '';
+        document.getElementById('itemDescription').value = '';
+        document.getElementById('itemLocation').value = '';
+        document.getElementById('contact').value = '';
+        document.getElementById('itemImage').value = '';
+      });
+    });
+  </script>
+
+  <footer></footer>
+</body>
+
+</html>
