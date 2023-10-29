@@ -7,8 +7,12 @@
   <title>UNC Lost Items</title>
   <link href="style.css" rel="stylesheet" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/siwalikm/quick-form-css@2.2.2/qfc-dark.css">
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA-4UFitFjBWPaQ-5PFO2I7BkzmDm5o35A"></script>
-  
+  <!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA-4UFitFjBWPaQ-5PFO2I7BkzmDm5o35A"></script> -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+  <script
+    src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&key=AIzaSyA-4UFitFjBWPaQ-5PFO2I7BkzmDm5o35A"></script>
+
 
 
 </head>
@@ -17,6 +21,9 @@
   <header>
     <h1>UNC Lost Items</h1>
   </header>
+
+
+
   <div class="topnav">
     <a href="index.html">About</a>
     <a class="active" href="lost.html">Lost Items</a>
@@ -25,15 +32,32 @@
   <div class="qfc-container">
     <form id="itemForm">
       <label for="itemName">Item Name:</label><br>
-      <input type="text" id="itemName" name="itemName" required><br>
+      <input type="text" id="itemName" name="itemName" placeholder="Type Name..." required><br>
       <label for="itemDescription">Item Description:</label><br>
-      <input type="text" id="itemDescription" name="itemDescription" required><br>
-      <label for="itemLocation">Approximate Last Location:</label><br>
-      <input type="text" id="itemLocation" name="itemLocation" required><br>
+      <input type="text" id="itemDescription" name="itemDescription" placeholder="Type Description..." required><br>
 
+
+
+
+      <label for="itemLocation">Approximate Last Location:</label><br>
+      <input type="text" id="itemLocation" name="itemLocation" placeholder="Type Location..." required><br>
+
+      <script>
+        var itemLocation = 'itemLocation';
+
+        $(document).ready(function () {
+          var autocomplete;
+          autocomplete = new google.maps.places.Autocomplete((document.getElementById('itemLocation')), {
+            types: ['geocode'],
+          });
+          google.maps.addListener(autocomplete, 'place_changed', function () {
+            var near_space = autocomplete.getPlace();
+          });
+        }); 
+      </script>
 
       <label for="contact">Contact Email:</label><br>
-      <input type="text" id="contact" name="contact" required><br>
+      <input type="text" id="contact" name="contact" placeholder="Type Email..." required><br>
       <label for="itemImage">Item Image:</label><br>
       <input type="file" id="itemImage" name="itemImage"><br>
       <input type="submit" value="Submit">
@@ -60,7 +84,7 @@
           itemDesc.textContent = 'Description: ' + item.description;
 
           var itemLoc = document.createElement('p');
-          itemLoc.textContent = 'Location: ' + item.location;
+          itemLoc.textContent = 'Last Known Location: ' + item.location;
 
           var email = document.createElement('p');
           email.textContent = 'Email: ' + item.email;
